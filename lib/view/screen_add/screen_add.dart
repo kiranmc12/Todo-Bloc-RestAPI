@@ -1,0 +1,102 @@
+import 'package:flutter/material.dart';
+import 'package:todo_bloc/constants/constants.dart';
+import 'package:todo_bloc/view/widgets/text_field_widget.dart';
+
+class ScreenAdd extends StatelessWidget {
+  ScreenAdd({Key? key});
+
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          title: Text(
+            "Make Your Todo",
+            style: TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        body: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Form(
+            key: formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Kheight20,
+                TextFieldWidget(
+                  hintText: "Title",
+                  controller: titleController,
+                  height: 75,
+                ),
+                Kheight20,
+                TextFieldWidget(
+                  hintText: "Description",
+                  maximumLine: 6,
+                  height: 170,
+                  controller: descriptionController,
+                ),
+                Kheight20,
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Flex(
+                    
+                    direction: Axis.horizontal,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        style: const ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(
+                            Color(0xFF2C3E50),
+                          ),
+                          fixedSize: MaterialStatePropertyAll(Size(150, 45)),
+                        ),
+                        onPressed: () {
+                        },
+                        child: const Text(
+                          "Save",
+                          style: TextStyle(
+                            color: Colors.white,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: const ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(
+                            Color(0xFFBDC3C7),
+                          ),
+                          fixedSize: MaterialStatePropertyAll(Size(150, 45)),
+                        ),
+                        onPressed: () {
+                          formKey.currentState!.reset();
+                        },
+                        child: const Text(
+                          "Clear All",
+                          style: TextStyle(
+                            color: Colors.white,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
