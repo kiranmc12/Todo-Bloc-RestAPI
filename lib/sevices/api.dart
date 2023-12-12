@@ -9,36 +9,44 @@ class ApiServices {
 
   factory ApiServices() => instance;
 
-  static const String endpoint =
-      "https://api.nstack.in/v1/todos?page=1&limit=10";
+  static const String endpoint = "https://api.nstack.in/v1/todos";
 
   Future<List<Todo>> fetchTodos() async {
-    final response = await http.get(Uri.parse(endpoint));
+    try {
+      final response = await http.get(Uri.parse(endpoint));
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
-      final List<dynamic> items = responseData['items'];
-      return items.map((json) => Todo.fromJson(json)).toList();
-    } else {
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final List<dynamic> items = responseData['items'];
+        return items.map((json) => Todo.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to fetch todos');
+      }
+    } catch (e) {
+      print('Error fetching todos: $e');
       throw Exception('Failed to fetch todos');
     }
   }
 
-
   Future<void> createTodo(Todo todo) async {
-    final response = await http.post(
-      Uri.parse(endpoint),
-      body: jsonEncode({
-        'title': todo.title,
-        'description': todo.description,
-        'is_completed': todo.isCompleted,
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse(endpoint),
+        body: {
+          'title': todo.title,
+          'description': todo.description,
+          'is_completed': 'true',
+        },
+      );
 
-    if (response.statusCode == 201) {
-      print("todo Created");
-    } else {
-      print('Failed to create todo ${response.statusCode}');
+      if (response.statusCode == 201) {
+        print("Todo Created");
+      } else {
+        print('Failed to create todo ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error creating todo: $e');
+      throw Exception('Failed to create todo');
     }
   }
 }

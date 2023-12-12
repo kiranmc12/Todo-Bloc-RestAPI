@@ -1,5 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:todo_bloc/bloc/todo_bloc_bloc.dart';
 import 'package:todo_bloc/constants/constants.dart';
+import 'package:todo_bloc/model/todo_model.dart';
 import 'package:todo_bloc/view/widgets/text_field_widget.dart';
 
 class ScreenAdd extends StatelessWidget {
@@ -8,7 +13,6 @@ class ScreenAdd extends StatelessWidget {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
 
   @override
   Widget build(BuildContext context) {
@@ -50,45 +54,39 @@ class ScreenAdd extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(5.0),
                   child: Flex(
-                    
                     direction: Axis.horizontal,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      ElevatedButton(
-                        style: const ButtonStyle(
-                          backgroundColor: MaterialStatePropertyAll(
-                            Color(0xFF2C3E50),
-                          ),
-                          fixedSize: MaterialStatePropertyAll(Size(150, 45)),
-                        ),
-                        onPressed: () {
+                      BlocBuilder<TodoBlocBloc, TodoBlocState>(
+                        builder: (context, state) {
+                          if (state.isSaving) {
+                            return SizedBox(
+                              width: 255,
+                              height: 45,
+                              child: Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          }
+                          return ElevatedButton(
+                            style: const ButtonStyle(
+                                backgroundColor: MaterialStatePropertyAll(
+                                  Color(0xFF2C3E50),
+                                ),
+                                fixedSize:
+                                    MaterialStatePropertyAll(Size(100, 45))),
+                            onPressed: () {
+                              validate(context);
+                            },
+                            child: const Text(
+                              "Save",
+                              style: TextStyle(
+                                  color: Colors.white, letterSpacing: 1),
+                            ),
+                          );
                         },
-                        child: const Text(
-                          "Save",
-                          style: TextStyle(
-                            color: Colors.white,
-                            letterSpacing: 1,
-                          ),
-                        ),
                       ),
-                      ElevatedButton(
-                        style: const ButtonStyle(
-                          backgroundColor: MaterialStatePropertyAll(
-                            Color(0xFFBDC3C7),
-                          ),
-                          fixedSize: MaterialStatePropertyAll(Size(150, 45)),
-                        ),
-                        onPressed: () {
-                          formKey.currentState!.reset();
-                        },
-                        child: const Text(
-                          "Clear All",
-                          style: TextStyle(
-                            color: Colors.white,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ),
+                   
                     ],
                   ),
                 ),
@@ -98,5 +96,21 @@ class ScreenAdd extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void validate(BuildContext context) async {
+    if (formKey.currentState!.validate()) {
+      final newTodo = Todo(
+          title: titleController.text,
+          description: descriptionController.text,
+          isCompleted: true);
+
+      try {
+        context.read<TodoBlocBloc>().add(TodoAddEvent(todo: newTodo));
+      } catch (e) {
+        print(e.toString());
+      }
+      formKey.currentState!.reset();
+    }
   }
 }
